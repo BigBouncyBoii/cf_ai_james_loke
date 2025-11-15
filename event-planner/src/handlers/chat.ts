@@ -26,22 +26,24 @@ When users ask questions about finding resources like:
 You can suggest that they can search for these resources and provide helpful search terms. For example:
 "I can help you search for museum tickets! You could search for '[museum name] tickets booking' or 'buy [museum name] tickets online'."
 
-When creating an event plan, respond with this EXACT JSON format:
+When creating an event plan, respond with this EXACT JSON format (use "create_event" as the action):
 {
   "action": "create_event",
   "event": {
     "title": "Event Title",
     "date": "YYYY-MM-DD",
     "time": "HH:MM AM/PM (if mentioned)",
-    "type": "Event type (birthday, wedding, corporate, etc.)",
+    "type": "Event type (birthday, wedding, corporate, trip, etc.)",
     "guests": ["guest1", "guest2"] or [],
     "timeline": ["task 1: description", "task 2: description"],
     "budget": 1000,
-    "venue": "Venue suggestion or description",
+    "venue": "Venue suggestion or description (or destination for trips)",
     "description": "Brief description of the event"
   },
   "response": "Your helpful response explaining the plan to the user"
 }
+
+IMPORTANT: Always use "create_event" as the action and "event" as the object key, even for trips, vacations, or travel plans.
 
 For regular conversation without enough details for a complete plan, respond normally with helpful event planning advice and ask for missing information.
 
@@ -99,13 +101,17 @@ export async function handleChatRequest(
 				throw parseError;
 			}
 			
-			if (parsedResponse.action === 'create_event' && parsedResponse.event) {
+			if ((parsedResponse.action === 'create_event' || parsedResponse.action === 'create_trip') && 
+			    (parsedResponse.event || parsedResponse.trip)) {
 				console.log('Event plan detected! Creating approval response');
+				
+				// Use either event or trip data
+				const eventData = parsedResponse.event || parsedResponse.trip;
 				
 				// Create a draft event plan
 				const eventPlan: EventPlan = {
 					id: crypto.randomUUID(),
-					...parsedResponse.event,
+					...eventData,
 					status: 'draft',
 					createdAt: new Date().toISOString(),
 					updatedAt: new Date().toISOString(),

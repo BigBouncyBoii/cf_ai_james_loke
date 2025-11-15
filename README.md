@@ -2,6 +2,10 @@
 
 An intelligent conversational event planning assistant built with Cloudflare Workers AI, featuring real-time web search capabilities and Slack integration for seamless event coordination.
 
+Recommended:
+
+**Live Demo**: [https://event-planner.jameslokejw.workers.dev](https://event-planner.jameslokejw.workers.dev)
+
 ## Overview
 
 The Event Planner Assistant allows users to plan events through natural conversation. The AI assistant can search the web for venues, tickets, catering services, and other event resources, then automatically share approved event plans with team members via Slack.
@@ -12,6 +16,13 @@ The Event Planner Assistant allows users to plan events through natural conversa
 - Natural language interface for describing event requirements
 - AI-powered generation of comprehensive event plans including timelines, budgets, and guest lists
 - Interactive approval system for reviewing and modifying plans before sharing
+
+Images:
+![alt text](image-3.png)
+![alt text](image-2.png)
+![alt text](image.png)
+![alt text](image-1.png)
+![alt text](image-4.png)
 
 **Real-Time Web Search Integration**
 - Automatic web search for event resources based on user requirements
@@ -50,9 +61,7 @@ Built on Cloudflare Workers platform with:
 ### Installation
 ```bash
 npm install
-npx wrangler secret put SLACK_BOT_TOKEN
-npx wrangler secret put SLACK_SIGNING_SECRET
-npm run deploy
+npx wrangler deploy
 ```
 
 ## Usage
