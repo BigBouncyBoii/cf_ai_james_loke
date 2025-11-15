@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Event Planner • Assistant</title>
+    <style>
+      :root {
+        --bg: #0b0f14; /* deep navy */
+        --panel: rgba(255, 255, 255, 0.03);
+        --muted: #9aa4ad;
+        --text: #e6eef6;
+        --accent: #f6821f; /* original orange retained */
+        --accent-2: #ff9a3c;
+        --glass: rgba(255, 255, 255, 0.04);
+        --shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          "Helvetica Neue",
+          Arial;
+        background: linear-gradient(180deg, var(--bg), #071018 140%);
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px;
+      }
+
+      .wrap {
+        width: 100%;
+        max-width: 980px;
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 24px;
+        align-items: start;
+      }
+
+      /* Main panel */
+      .panel {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        min-height: 72vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      header.app-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 12px;
+      }
+
+      .logo {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: #081019;
+        box-shadow: 0 6px 18px rgba(246, 130, 31, 0.18);
+      }
+
+      h1 {
+        font-size: 1.125rem;
+        margin: 0;
+      }
+      p.lead {
+        color: var(--muted);
+        margin: 0;
+        font-size: 0.95rem;
+      }
+
+      /* Chat area */
+      .chat {
+        margin-top: 16px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        /* allow children to shrink so the messages area can scroll properly */
+        min-height: 0;
+      }
+
+      .messages {
+        /* Fixed height for scrollable chat area */
+        height: 400px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        scroll-behavior: smooth;
+        background: linear-gradient(
+          180deg,
+          transparent,
+          rgba(255, 255, 255, 0.01)
+        );
+        border-radius: 12px;
+      }
+
+      .msg {
+        max-width: 78%;
+        padding: 12px 14px;
+        border-radius: 12px;
+        line-height: 1.4;
+        box-shadow: 0 6px 18px rgba(2, 6, 23, 0.45);
+      }
+
+      .assistant {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          var(--glass)
+        );
+        align-self: flex-start;
+        color: var(--text);
+      }
+
+      .user {
+        background: linear-gradient(180deg, var(--accent), var(--accent-2));
+        color: #081019;
+        align-self: flex-end;
+      }
+
+      .chips {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+      }
+
+      .chip {
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--text);
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        cursor: pointer;
+        font-size: 0.9rem;
+      }
+      .chip:hover {
+        transform: translateY(-2px);
+        transition: transform 0.15s;
+      }
+
+      /* Input */
+      .composer {
+        margin-top: 12px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      textarea#user-input {
+        flex: 1;
+        min-height: 54px;
+        max-height: 160px;
+        resize: vertical;
+        border-radius: 12px;
+        padding: 12px 14px;
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        outline: none;
+        font-size: 0.95rem;
+      }
+
+      .actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+      }
+
+      button#send-button {
+        background: linear-gradient(180deg, var(--accent), var(--accent-2));
+        color: #081019;
+        border: none;
+        padding: 10px 14px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 600;
+        box-shadow: 0 8px 20px rgba(246, 130, 31, 0.12);
+      }
+
+      button.secondary {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        padding: 8px 10px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+
+      /* Right sidebar */
+      .sidebar {
+        min-height: 72vh;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.01),
+          rgba(255, 255, 255, 0.02)
+        );
+        border-radius: 16px;
+        padding: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        box-shadow: var(--shadow);
+      }
+
+      .sidebar h3 {
+        margin: 0 0 8px 0;
+      }
+      .meta {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+      }
+
+      .suggestion {
+        background: rgba(246, 130, 31, 0.12);
+        color: var(--accent);
+        padding: 8px 10px;
+        border-radius: 8px;
+        font-weight: 600;
+        border: 1px solid rgba(246, 130, 31, 0.08);
+      }
+
+      /* small screens */
+      @media (max-width: 860px) {
+        .wrap {
+          grid-template-columns: 1fr;
+          padding: 0;
+        }
+        .sidebar {
+          order: 2;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <main class="panel">
+        <header class="app-header">
+          <div class="logo">EP</div>
+          <div>
+            <h1>Event Planner Assistant</h1>
+            <p class="lead">
+              A relaxed assistant to help you build schedules, guest lists and
+              budgets — just tell me what you'd like.
+            </p>
+          </div>
+        </header>
+
+        <section class="chat">
+          <div id="chat-messages" class="messages" aria-live="polite">
+            <div class="msg assistant">
+              Hi — I'm your Event Planner. Tell me the type of event, date,
+              guest count, and any priorities (budget, food, activities). I can
+              draft a plan, suggest timelines, and create a guest checklist.
+            </div>
+          </div>
+
+          <!-- Typing indicator for chat.js -->
+          <div
+            id="typing-indicator"
+            class="typing-indicator"
+            style="
+              display: none;
+              padding: 12px;
+              color: var(--muted);
+              font-style: italic;
+            "
+          >
+            AI is thinking...
+          </div>
+
+          <div class="chips" aria-hidden="false">
+            <div class="chip" data-preset="Create a timeline">
+              Create a timeline
+            </div>
+            <div class="chip" data-preset="Build guest list">
+              Build guest list
+            </div>
+            <div class="chip" data-preset="Estimate budget">
+              Estimate budget
+            </div>
+            <div class="chip" data-preset="Venue suggestions">
+              Venue suggestions
+            </div>
+          </div>
+
+          <div class="composer">
+            <textarea
+              id="user-input"
+              placeholder="Describe your event or pick a suggestion..."
+              rows="2"
+              autofocus
+            ></textarea>
+            <div class="actions">
+              <button id="send-button">Send</button>
+              <button class="secondary" id="clear-button">Clear</button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <aside class="sidebar">
+        <h3>Quick tips</h3>
+        <p class="meta">
+          Start with: event type, date, expected guests, and one priority. I'll
+          ask follow-ups as needed.
+        </p>
+        <div style="display: flex; gap: 8px; flex-direction: column">
+          <div class="suggestion">
+            Try: "Outdoor birthday, 50 guests, moderate budget"
+          </div>
+          <div style="height: 8px"></div>
+          <div><strong>Shortcuts</strong></div>
+          <ul style="color: var(--muted)">
+            <li>Tap a suggestion to prefill the composer</li>
+            <li>Press Enter to send (Shift+Enter for newline)</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+
+    <script>
+      // Simple UI helpers - main chat logic is in chat.js
+      const chips = document.querySelectorAll(".chip");
+      const clearBtn = document.getElementById("clear-button");
+
+      // Chip click handlers
+      chips.forEach((c) =>
+        c.addEventListener("click", () => {
+          const userInput = document.getElementById("user-input");
+          userInput.value = c.dataset.preset || c.textContent;
+          userInput.focus();
+        })
+      );
+
+      // Clear button
+      clearBtn.addEventListener("click", () => {
+        const userInput = document.getElementById("user-input");
+        userInput.value = "";
+        userInput.focus();
+      });
+
+      // Add typing indicator styles
+      const style = document.createElement("style");
+      style.textContent = `
+				.typing-indicator.visible {
+					display: block !important;
+				}
+				.typing-indicator {
+					display: none;
+					animation: pulse 1.5s ease-in-out infinite;
+				}
+				@keyframes pulse {
+					0%, 100% { opacity: 0.6; }
+					50% { opacity: 1; }
+				}
+			`;
+      document.head.appendChild(style);
+    </script>
+
+    <!-- Keep original chat.js hook for any app logic -->
+    <script src="chat.js"></script>
+  </body>
+</html>
